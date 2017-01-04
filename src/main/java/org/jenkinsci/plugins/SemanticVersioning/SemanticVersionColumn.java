@@ -83,7 +83,9 @@ public class SemanticVersionColumn extends ListViewColumn {
 
         @Override
         public ListViewColumn newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-            String strategy = formData == null ? LastSuccessfulBuildStrategy.class.getCanonicalName() : formData.getString("displayStrategy");
+            String strategy = formData == null || !formData.has("displayStrategy")
+                    ? LastSuccessfulBuildStrategy.class.getCanonicalName()
+                    : formData.getString("displayStrategy");
             return new SemanticVersionColumn(strategy);
         }
 
