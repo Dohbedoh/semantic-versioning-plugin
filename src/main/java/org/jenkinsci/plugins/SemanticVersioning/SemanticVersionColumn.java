@@ -30,6 +30,7 @@ import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.util.ListBoxModel;
 import hudson.views.ListViewColumn;
+import hudson.views.ListViewColumnDescriptor;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.SemanticVersioning.columnDisplay.AbstractColumnDisplayStrategy;
@@ -75,18 +76,23 @@ public class SemanticVersionColumn extends ListViewColumn {
     }
 
     @Extension(ordinal = 1.5)
-    public static class SemanticVersionColumnDescriptor extends Descriptor<ListViewColumn> {
+    public static class SemanticVersionColumnDescriptor extends ListViewColumnDescriptor {
+
         public SemanticVersionColumnDescriptor() {
-            super(SemanticVersionColumn.class);
             load();
         }
 
         @Override
         public ListViewColumn newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-            String strategy = formData == null || !formData.has("displayStrategy")
+            String strategy = formData == null
                     ? LastSuccessfulBuildStrategy.class.getCanonicalName()
-                    : formData.getString("displayStrategy");
+                    : formData.optString("displayStrategy", LastSuccessfulBuildStrategy.class.getCanonicalName());
             return new SemanticVersionColumn(strategy);
+        }
+
+        @Override
+        public boolean shownByDefault() {
+            return false;
         }
 
         public ListBoxModel doFillDisplayStrategyItems() {
